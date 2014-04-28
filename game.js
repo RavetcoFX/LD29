@@ -13,37 +13,8 @@ function preload() {
 var charDiver;
 var wall;
 var depth = 0;
+var depthText;
 var isGameOver = false;
-
-function create() {
-
-    game.physics.startSystem(Phaser.Physics.P2JS);
-    game.physics.p2.setImpactEvents(true);
-    game.physics.p2.restitution = 0.8;
-    
-    var diverCollisionGroup = game.physics.p2.createCollisionGroup();
-    var wallsCollisionGroup = game.physics.p2.createCollisionGroup();
-    
-    game.physics.p2.updateBoundsCollisionGroup();
-
-    game.stage.backgroundColor = '#8BC3F2'; //Nice blue
-
-    charDiver = game.add.sprite(120, 210, 'char');
-    charDiver.animations.add('swim');
-    charDiver.animations.play('swim', 5, true);
-    charDiver.anchor.setTo(0.5, 0.5);
-    charDiver.smoothed = false;
-    game.physics.p2.enable(charDiver, true);
-    charDiver.body.allowRotation = false;
-    //charDiver.body.setSize(80, 20, 0, 0);
-    charDiver.scale.setTo(0.7, 0.7);
-
-    walls = game.add.group();
-    walls.enableBody = true;
-    walls.createMultiple(50, 'wall_h', 0, false);
-    game.physicsBodyType = Phaser.Physics.P2JS;
-
-}
 
 setInterval(function () {
     depth++;
@@ -51,6 +22,32 @@ setInterval(function () {
 setInterval(function () {
     addRowWalls();
 }, 1000);
+
+
+function create() {
+
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
+    game.stage.backgroundColor = '#7CBFE4'; //Nice blue
+
+    charDiver = game.add.sprite(120, 210, 'char');
+    charDiver.animations.add('swim');
+    charDiver.animations.play('swim', 5, true);
+    charDiver.anchor.setTo(0.5, 0.5);
+    smoothed = false;
+    game.physics.enable(charDiver, Phaser.Physics.ARCADE);
+    charDiver.body.allowRotation = false;
+    charDiver.body.setSize(50, 50, 0, 0);
+    charDiver.scale.setTo(0.7, 0.7);
+
+    walls = game.add.group();
+    walls.createMultiple(50, 'wall_h', 0, false);
+    game.physics.enable(walls, Phaser.Physics.ARCADE);
+
+    depthText = game.add.text(10, 20, "Depth: " + depth, { font: '22px Arial', fill: '#FFF' });
+    
+
+}
 
 function update() {
 
@@ -83,9 +80,6 @@ function createOneWall(x, y) {
     var wall = this.walls.getFirstDead();
     wall.checkWorldBounds = true;
     wall.reset(x, y);
-    wall.body.setRectangle(64, 32);
-    wall.body.setCollisionGroup(wallsCollisionGroup);
-    panda.body.collides([DiverCollisionGroup]);
     wall.body.velocity.y = -400;
     wall.scale.setTo(2, 1);
     wall.outOfBoundsKill = true;
@@ -106,13 +100,12 @@ function addRowWalls() {
 function render() {
 
     //game.debug.spriteInfo(charDiver, 10, 20);
-    game.debug.text("Depth: " + depth, 10, 20);
-    game.debug.body(charDiver);
+    //game.debug.body(charDiver);
     //game.debug.spriteBounds(walls);
 
 }
 
 function restartGame() {
-    walls.distroy();
+    depth = 0;
     create();
 }
